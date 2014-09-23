@@ -2,8 +2,9 @@
 <resources>
 
     <string name="app_name">NPuzzle10433120</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="start">Start</string>
     <string name="change_picture">Change Picture</string>
     <string name="change_difficulty">Change Difficulty</string>
+    <string name="action_settings">Settings</string>
 
 </resources>
