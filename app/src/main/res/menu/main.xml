@@ -2,12 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".game_activity" >
+    <item android:id="@+id/change_difficulty"
+        android:title="@string/change_difficulty"
+        android:orderInCategory="50"
+        app:showAsAction="never" />
     <item android:id="@+id/change_picture"
         android:title="@string/change_picture"
         android:orderInCategory="100"
         app:showAsAction="never" />
-    <item android:id="@+id/change_difficulty"
-        android:title="@string/change_difficulty"
-        android:orderInCategory="50"
+    <item android:id="@+id/game_button"
+        android:title="@string/game_button"
+        android:orderInCategory="150"
         app:showAsAction="never" />
 </menu>

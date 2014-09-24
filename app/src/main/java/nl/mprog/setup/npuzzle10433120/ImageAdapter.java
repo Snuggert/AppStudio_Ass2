@@ -7,13 +7,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-/**
- * Created by TheAbe on 24-Sep-14.
- */
+import java.util.ArrayList;
+
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private Bitmap gridBitmap;
     private Bitmap[] gridBitmapArray;
+    private ArrayList<GridData> dataArray = new ArrayList<GridData>();
     private int nRows, nCols;
 
     // Constructor
@@ -35,7 +35,14 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public void setBitmap(Bitmap bitmap, int width, int height){
-        this.gridBitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
+        this.gridBitmap =
+                Bitmap.createScaledBitmap(bitmap, width, height, false);
+        if(gridBitmap != null){
+            divideBitmap();
+        }
+    }
+
+    public void resetBitmap(){
         if(gridBitmap != null){
             divideBitmap();
         }
@@ -51,15 +58,18 @@ public class ImageAdapter extends BaseAdapter {
 
     private void divideBitmap(){
         int width, height;
-        this.gridBitmapArray = new Bitmap[nCols * nRows];
+        this.dataArray.clear();
 
         width = gridBitmap.getWidth() / nCols;
         height = gridBitmap.getHeight() / nRows;
-        for(int index = 0; index < nCols * nRows; index++){
-            this.gridBitmapArray[index] =
+        for(int index = 0; index < (nCols * nRows) - 1; index++){
+            this.dataArray.add(new GridData(
                 Bitmap.createBitmap(gridBitmap, (index % nCols) * width,
-                                    (index / nRows) * height, width, height);
+                    (index / nRows) * height, width, height), index));
         }
+        this.dataArray.add(new GridData(
+                Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444),
+                                    (nCols * nRows) - 1));
     }
 
     // create a new ImageView for each item referenced by the Adapter
@@ -72,7 +82,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
         if(this.gridBitmap != null) {
-            imageView.setImageBitmap(this.gridBitmapArray[position]);
+            imageView.setImageBitmap(this.dataArray.get(position).picture);
         }
         return imageView;
     }

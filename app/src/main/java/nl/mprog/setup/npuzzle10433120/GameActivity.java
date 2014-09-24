@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -29,6 +28,7 @@ public class GameActivity extends ActionBarActivity {
     private final CharSequence difs[]
         = new CharSequence[] {"easy", "medium", "hard"};
     private final int[] sizes = {3,4,5};
+    private static boolean started = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +81,10 @@ public class GameActivity extends ActionBarActivity {
             intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(
                 Intent.createChooser(intent, "Select Picture"), GALLERY);
+        }else if (id == R.id.game_button) {
+            imageAdapter.resetBitmap();
+            gridView.setAdapter(imageAdapter);
+            this.started = !this.started;
         }
         return super.onOptionsItemSelected(item);
     }
