@@ -1,5 +1,7 @@
 package nl.mprog.setup.npuzzle10433120;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.Image;
@@ -16,19 +18,38 @@ import java.io.IOException;
 
 public class GameActivity extends ActionBarActivity {
 
-    public static Bitmap Image = null;
+    private static Bitmap Image = null;
     private static final int GALLERY = 1;
     private static ImageAdapter imageAdapter;
+    private static AlertDialog.Builder builder;
     private static GridView gridView;
+    private static int nCols = 4;
+    private static int nRows = 4;
+    private final CharSequence difs[]
+        = new CharSequence[] {"easy", "medium", "hard"};
+    private final int[] sizes = {3,4,5};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent myIntent = getIntent();
         setContentView(R.layout.game_activity);
 
         gridView = (GridView) findViewById(R.id.gridView);
+        gridView.setNumColumns(nCols);
+
         imageAdapter = new ImageAdapter(this);
+        imageAdapter.setSize(nCols, nRows);
         gridView.setAdapter(imageAdapter);
+
+        builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pick a difficulty");
+        builder.setItems(difs, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                nRows = sizes[which];
+                nCols = sizes[which];
+            }
+        });
     }
 
 
@@ -46,21 +67,25 @@ public class GameActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.change_difficulty) {
-            return true;
+            builder.show();
+            gridView.setNumColumns(nCols);
         }else if (id == R.id.change_picture) {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), GALLERY);
+            startActivityForResult(
+                Intent.createChooser(intent, "Select Picture"), GALLERY);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data){
         if (requestCode == GALLERY && resultCode != 0) {
             Uri mImageUri = data.getData();
             try {
-                Image = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mImageUri);
+                Image = MediaStore.Images.Media.getBitmap(
+                    this.getContentResolver(), mImageUri);
                 imageAdapter.setBitmap(Image);
                 gridView.setAdapter(imageAdapter);
             } catch (FileNotFoundException e) {
@@ -70,5 +95,4 @@ public class GameActivity extends ActionBarActivity {
             }
         }
     }
-
 }

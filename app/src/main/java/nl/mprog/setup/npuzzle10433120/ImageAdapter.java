@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 
 /**
@@ -14,6 +13,8 @@ import android.widget.ImageView;
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private Bitmap gridBitmap;
+    private Bitmap[] gridBitmapArray;
+    private int nRows, nCols;
 
     // Constructor
     public ImageAdapter(Context c) {
@@ -21,7 +22,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return 16;
+        return nRows * nCols;
     }
 
     public Object getItem(int position) {
@@ -32,8 +33,32 @@ public class ImageAdapter extends BaseAdapter {
         return 0;
     }
 
-    public int setBitmap(Bitmap bitmap){
+    public void setBitmap(Bitmap bitmap){
         this.gridBitmap = bitmap;
+        if(gridBitmap != null){
+            divideBitmap();
+        }
+    }
+
+    public void setSize(int cols, int rows){
+        this.nCols = cols;
+        this.nRows = rows;
+        if(gridBitmap != null){
+            divideBitmap();
+        }
+    }
+
+    private int divideBitmap(){
+        int width, height;
+        this.gridBitmapArray = new Bitmap[nCols * nRows];
+
+        width = gridBitmap.getWidth() / nCols;
+        height = gridBitmap.getHeight() / nRows;
+        for(int index = 0; index < nCols * nRows; index++){
+            this.gridBitmapArray[index] =
+                Bitmap.createBitmap(gridBitmap, (index % nCols) * width,
+                                    (index / nRows) * height, width, height);
+        }
         return 1;
     }
 
@@ -42,11 +67,13 @@ public class ImageAdapter extends BaseAdapter {
         ImageView imageView;
         if (convertView == null) {
             imageView = new ImageView(mContext);
+            imageView.setAdjustViewBounds(true);
         } else {
             imageView = (ImageView) convertView;
         }
-
-        imageView.setImageBitmap(this.gridBitmap);
+        if(this.gridBitmap != null) {
+            imageView.setImageBitmap(this.gridBitmapArray[position]);
+        }
         return imageView;
     }
 }
