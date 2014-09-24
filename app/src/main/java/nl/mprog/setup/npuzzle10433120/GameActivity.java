@@ -11,6 +11,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.io.FileNotFoundException;
@@ -18,7 +20,6 @@ import java.io.IOException;
 
 public class GameActivity extends ActionBarActivity {
 
-    private static Bitmap Image = null;
     private static final int GALLERY = 1;
     private static ImageAdapter imageAdapter;
     private static AlertDialog.Builder builder;
@@ -36,6 +37,11 @@ public class GameActivity extends ActionBarActivity {
 
         gridView = (GridView) findViewById(R.id.gridView);
         gridView.setNumColumns(nCols);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+            }
+        });
 
         imageAdapter = new ImageAdapter(this);
         imageAdapter.setSize(nCols, nRows);
@@ -84,9 +90,9 @@ public class GameActivity extends ActionBarActivity {
         if (requestCode == GALLERY && resultCode != 0) {
             Uri mImageUri = data.getData();
             try {
-                Image = MediaStore.Images.Media.getBitmap(
+                Bitmap Image = MediaStore.Images.Media.getBitmap(
                     this.getContentResolver(), mImageUri);
-                imageAdapter.setBitmap(Image);
+                imageAdapter.setBitmap(Image, gridView.getWidth(), gridView.getHeight());
                 gridView.setAdapter(imageAdapter);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

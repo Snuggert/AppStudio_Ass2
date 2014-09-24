@@ -31,10 +31,11 @@ public class ImageAdapter extends BaseAdapter {
 
     public long getItemId(int position) {
         return 0;
+
     }
 
-    public void setBitmap(Bitmap bitmap){
-        this.gridBitmap = bitmap;
+    public void setBitmap(Bitmap bitmap, int width, int height){
+        this.gridBitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
         if(gridBitmap != null){
             divideBitmap();
         }
@@ -48,7 +49,7 @@ public class ImageAdapter extends BaseAdapter {
         }
     }
 
-    private int divideBitmap(){
+    private void divideBitmap(){
         int width, height;
         this.gridBitmapArray = new Bitmap[nCols * nRows];
 
@@ -59,7 +60,6 @@ public class ImageAdapter extends BaseAdapter {
                 Bitmap.createBitmap(gridBitmap, (index % nCols) * width,
                                     (index / nRows) * height, width, height);
         }
-        return 1;
     }
 
     // create a new ImageView for each item referenced by the Adapter
