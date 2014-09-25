@@ -21,20 +21,20 @@ public class GameActivity extends ActionBarActivity {
 
     private static final int GALLERY = 1;
     private static ImageAdapter imageAdapter;
-    private static AlertDialog.Builder builder;
     private static GridView gridView;
     private static int nCols = 4;
     private static int nRows = 4;
+    private static int whichIndex = 1;
     private final CharSequence difs[]
         = new CharSequence[] {"easy", "medium", "hard"};
     private final int[] sizes = {3,4,5};
     private static boolean started = false;
+    private static AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_activity);
-
         gridView = (GridView) findViewById(R.id.gridView);
         gridView.setNumColumns(nCols);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -49,11 +49,15 @@ public class GameActivity extends ActionBarActivity {
 
         builder = new AlertDialog.Builder(this);
         builder.setTitle("Pick a difficulty");
-        builder.setItems(difs, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(difs, whichIndex, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                nRows = sizes[which];
+                whichIndex = which;
                 nCols = sizes[which];
+                nRows = sizes[which];
+                gridView.setNumColumns(nCols);
+                imageAdapter.setSize(nCols, nRows);
+                gridView.setAdapter(imageAdapter);
             }
         });
     }
@@ -74,7 +78,6 @@ public class GameActivity extends ActionBarActivity {
         int id = item.getItemId();
         if (id == R.id.change_difficulty) {
             builder.show();
-            gridView.setNumColumns(nCols);
         }else if (id == R.id.change_picture) {
             Intent intent = new Intent();
             intent.setType("image/*");
@@ -102,7 +105,8 @@ public class GameActivity extends ActionBarActivity {
             try {
                 Bitmap Image = MediaStore.Images.Media.getBitmap(
                     this.getContentResolver(), mImageUri);
-                imageAdapter.setBitmap(Image, gridView.getWidth(), gridView.getHeight());
+                imageAdapter.setBitmap(Image, gridView.getWidth(),
+                                       gridView.getHeight());
                 gridView.setAdapter(imageAdapter);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

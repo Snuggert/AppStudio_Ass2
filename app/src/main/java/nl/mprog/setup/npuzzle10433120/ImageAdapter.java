@@ -53,6 +53,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public void shuffleBitmap(){
+        seed = System.nanoTime();
         Collections.shuffle(this.dataArray, new Random(this.seed));
     }
 
@@ -73,11 +74,11 @@ public class ImageAdapter extends BaseAdapter {
         for(int index = 0; index < (nCols * nRows) - 1; index++){
             this.dataArray.add(new GridData(
                 Bitmap.createBitmap(gridBitmap, (index % nCols) * width,
-                    (index / nRows) * height, width, height), index));
+                    (index / nRows) * height, width, height), index, false));
         }
         this.dataArray.add(new GridData(
                 Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444),
-                                    (nCols * nRows) - 1));
+                                    (nCols * nRows) - 1, true));
     }
 
     // create a new ImageView for each item referenced by the Adapter
