@@ -53,7 +53,7 @@ public class GameActivity extends ActionBarActivity {
                     gridView.setAdapter(imageAdapter);
                     if(imageAdapter.isFinished()){
                         long endtime = SystemClock.uptimeMillis() - startTime;
-                        finishText.setText("Finished" + (SystemClock.uptimeMillis() - startTime));
+                        finishText.setText("Finished " + ((int)(endtime / 1000)) + " seconden.");
                     }
                 }
             }
