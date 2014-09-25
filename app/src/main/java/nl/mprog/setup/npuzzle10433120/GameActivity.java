@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,16 +32,30 @@ public class GameActivity extends ActionBarActivity {
     private final int[] sizes = {3,4,5};
     private static boolean started = false;
     private static AlertDialog.Builder builder;
+    private static TextView finishText;
+    private static MenuItem gameButton;
+    private static long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_activity);
+
+        finishText = (TextView) findViewById(R.id.finishView);
+        gameButton = (MenuItem) findViewById(R.id.game_button);
+
         gridView = (GridView) findViewById(R.id.gridView);
         gridView.setNumColumns(nCols);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
+                if(imageAdapter.trySwitch(position)){
+                    gridView.setAdapter(imageAdapter);
+                    if(imageAdapter.isFinished()){
+                        long endtime = SystemClock.uptimeMillis() - startTime;
+                        finishText.setText("Finished" + (SystemClock.uptimeMillis() - startTime));
+                    }
+                }
             }
         });
 
@@ -89,10 +105,16 @@ public class GameActivity extends ActionBarActivity {
                 imageAdapter.resetBitmap();
                 gridView.setAdapter(imageAdapter);
                 this.started = !this.started;
+                finishText.setText("");
+                if(gameButton != null)
+                    gameButton.setTitle("Start");
+                startTime = SystemClock.uptimeMillis();
             }else{
                 this.started = true;
                 imageAdapter.shuffleBitmap();
                 gridView.setAdapter(imageAdapter);
+                if(gameButton != null)
+                    gameButton.setTitle("Reset");
             }
         }
         return super.onOptionsItemSelected(item);

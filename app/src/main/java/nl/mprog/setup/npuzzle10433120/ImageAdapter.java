@@ -15,7 +15,6 @@ public class ImageAdapter extends BaseAdapter {
     long seed;
     private Context mContext;
     private Bitmap gridBitmap;
-    private Bitmap[] gridBitmapArray;
     private ArrayList<GridData> dataArray = new ArrayList<GridData>();
     private int nRows, nCols;
 
@@ -29,13 +28,34 @@ public class ImageAdapter extends BaseAdapter {
         return nRows * nCols;
     }
 
-    public Object getItem(int position) {
-        return null;
+    public GridData getItem(int position) {
+        return dataArray.get(position);
     }
 
     public long getItemId(int position) {
         return 0;
+    }
 
+    public boolean trySwitch(int position){
+        int left, top, right, bottom;
+        left = position - 1;
+        top = position - nRows;
+        right = position + 1;
+        bottom = position + nRows;
+        if(left >= 0 && (position % nRows != 0 && position != 0) && dataArray.get(left).empty){
+            Collections.swap(dataArray, left, position);
+            return true;
+        }else if(top >= 0 && dataArray.get(top).empty){
+            Collections.swap(dataArray, top, position);
+            return true;
+        } else if(right % nRows != 0 && dataArray.get(right).empty){
+            Collections.swap(dataArray, right, position);
+            return true;
+        } else if(bottom < nRows * nCols && dataArray.get(bottom).empty){
+            Collections.swap(dataArray, bottom, position);
+            return true;
+        }
+        return false;
     }
 
     public void setBitmap(Bitmap bitmap, int width, int height){
@@ -63,6 +83,15 @@ public class ImageAdapter extends BaseAdapter {
         if(gridBitmap != null){
             divideBitmap();
         }
+    }
+
+    public boolean isFinished(){
+        for(int index = 0; index < nCols * nRows; index++){
+            if(dataArray.get(index).position != index){
+                return false;
+            }
+        }
+        return true;
     }
 
     private void divideBitmap(){
