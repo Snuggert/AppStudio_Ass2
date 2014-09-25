@@ -111,7 +111,7 @@ public class GameActivity extends ActionBarActivity {
                 startTime = SystemClock.uptimeMillis();
             }else{
                 this.started = true;
-                imageAdapter.shuffleBitmap();
+                imageAdapter.shuffleBitmap(1000);
                 gridView.setAdapter(imageAdapter);
                 if(gameButton != null)
                     gameButton.setTitle("Reset");

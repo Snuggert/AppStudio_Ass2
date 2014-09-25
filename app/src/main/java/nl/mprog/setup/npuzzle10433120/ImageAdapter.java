@@ -42,7 +42,8 @@ public class ImageAdapter extends BaseAdapter {
         top = position - nRows;
         right = position + 1;
         bottom = position + nRows;
-        if(left >= 0 && (position % nRows != 0 && position != 0) && dataArray.get(left).empty){
+        if(left >= 0 && (position % nRows != 0 && position != 0)
+            && dataArray.get(left).empty){
             Collections.swap(dataArray, left, position);
             return true;
         }else if(top >= 0 && dataArray.get(top).empty){
@@ -72,9 +73,32 @@ public class ImageAdapter extends BaseAdapter {
         }
     }
 
-    public void shuffleBitmap(){
-        seed = System.nanoTime();
-        Collections.shuffle(this.dataArray, new Random(this.seed));
+    public void shuffleBitmap(int times){
+        int directionIndex, randomIndex, direction;
+
+        Random random = new Random();
+        int dataIndex = (nCols * nRows) - 1;
+        int directions[] = {-1, -nRows, 1, nRows};
+
+        for(int index = 0; index < times; index++){
+            directionIndex = random.nextInt(4);
+            direction =  directions[directionIndex];
+            randomIndex = dataIndex + direction;
+
+            if(direction == -1 && randomIndex >= 0 &&
+                (randomIndex % nRows != 0 && randomIndex != 0)){
+                Collections.swap(dataArray, randomIndex, dataIndex);
+            } else if(direction == -nRows && randomIndex >= 0){
+                Collections.swap(dataArray, randomIndex, dataIndex);
+            } else if(direction  == 1 && randomIndex % nRows != 0){
+                Collections.swap(dataArray, randomIndex, dataIndex);
+            } else if(direction == nRows && randomIndex < nRows * nCols){
+                Collections.swap(dataArray, randomIndex, dataIndex);
+            } else{
+                continue;
+            }
+            dataIndex = randomIndex;
+        }
     }
 
     public void setSize(int cols, int rows){
