@@ -8,8 +8,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 public class ImageAdapter extends BaseAdapter {
+    long seed;
     private Context mContext;
     private Bitmap gridBitmap;
     private Bitmap[] gridBitmapArray;
@@ -18,6 +21,7 @@ public class ImageAdapter extends BaseAdapter {
 
     // Constructor
     public ImageAdapter(Context c) {
+        seed = System.nanoTime();
         mContext = c;
     }
 
@@ -46,6 +50,10 @@ public class ImageAdapter extends BaseAdapter {
         if(gridBitmap != null){
             divideBitmap();
         }
+    }
+
+    public void shuffleBitmap(){
+        Collections.shuffle(this.dataArray, new Random(this.seed));
     }
 
     public void setSize(int cols, int rows){

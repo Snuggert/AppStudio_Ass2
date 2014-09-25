@@ -82,9 +82,15 @@ public class GameActivity extends ActionBarActivity {
             startActivityForResult(
                 Intent.createChooser(intent, "Select Picture"), GALLERY);
         }else if (id == R.id.game_button) {
-            imageAdapter.resetBitmap();
-            gridView.setAdapter(imageAdapter);
-            this.started = !this.started;
+            if(this.started){
+                imageAdapter.resetBitmap();
+                gridView.setAdapter(imageAdapter);
+                this.started = !this.started;
+            }else{
+                this.started = true;
+                imageAdapter.shuffleBitmap();
+                gridView.setAdapter(imageAdapter);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
