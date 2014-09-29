@@ -17,7 +17,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void startGame(View view){
-        Intent gameIntent = new Intent(MainActivity.this, GameActivity.class);
+        Intent gameIntent = new Intent(MainActivity.this, GamePlay.class);
         startActivity(gameIntent);
     }
 }

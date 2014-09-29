@@ -19,7 +19,7 @@ import android.widget.TextView;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class GameActivity extends ActionBarActivity {
+public class GamePlay extends ActionBarActivity {
 
     private static final int GALLERY = 1;
     private static ImageAdapter imageAdapter;
@@ -49,13 +49,13 @@ public class GameActivity extends ActionBarActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                if(imageAdapter.trySwitch(position)){
-                    gridView.setAdapter(imageAdapter);
-                    if(imageAdapter.isFinished()){
-                        long endtime = SystemClock.uptimeMillis() - startTime;
-                        finishText.setText("Finished " + ((int)(endtime / 1000)) + " seconden.");
-                    }
+            if(imageAdapter.trySwitch(position)){
+                gridView.setAdapter(imageAdapter);
+                if(imageAdapter.isFinished()){
+                    long endtime = SystemClock.uptimeMillis() - startTime;
+                    finishText.setText("Finished " + ((int)(endtime / 1000)) + " seconden.");
                 }
+            }
             }
         });
 

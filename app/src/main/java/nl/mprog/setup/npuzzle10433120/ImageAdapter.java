@@ -1,5 +1,11 @@
 package nl.mprog.setup.npuzzle10433120;
 
+/*
+ * Abe Wiersma
+ * 10433120
+ * abe.wiersma@hotmail.nl
+ */
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.View;
@@ -18,7 +24,7 @@ public class ImageAdapter extends BaseAdapter {
     private ArrayList<GridData> dataArray = new ArrayList<GridData>();
     private int nRows, nCols;
 
-    // Constructor
+    /* Constructor for the ImageAdapter. */
     public ImageAdapter(Context c) {
         seed = System.nanoTime();
         mContext = c;
@@ -36,12 +42,16 @@ public class ImageAdapter extends BaseAdapter {
         return 0;
     }
 
+    /* Check if a switch is allowed. */
     public boolean trySwitch(int position){
         int left, top, right, bottom;
+
         left = position - 1;
         top = position - nRows;
         right = position + 1;
         bottom = position + nRows;
+
+        /* Check if a move is allowed. If not return false */
         if(left >= 0 && (position % nRows != 0 && position != 0)
             && dataArray.get(left).empty){
             Collections.swap(dataArray, left, position);
@@ -59,6 +69,7 @@ public class ImageAdapter extends BaseAdapter {
         return false;
     }
 
+    /* Set the bitmap of the adapter to a new bitmap. */
     public void setBitmap(Bitmap bitmap, int width, int height){
         this.gridBitmap =
                 Bitmap.createScaledBitmap(bitmap, width, height, false);
@@ -67,24 +78,36 @@ public class ImageAdapter extends BaseAdapter {
         }
     }
 
+    /* Reset the bitmap when the gridBitmap isn't null. */
     public void resetBitmap(){
         if(gridBitmap != null){
             divideBitmap();
         }
     }
 
+    /*
+     * Method to shuffle the tiles of the gridview, it does times tries to move
+     * in a random direction.
+     */
     public void shuffleBitmap(int times){
-        int directionIndex, randomIndex, direction;
+        int directionIndex, randomIndex, direction, dataIndex;
 
         Random random = new Random();
-        int dataIndex = (nCols * nRows) - 1;
+        dataIndex = (nCols * nRows) - 1;
         int directions[] = {-1, -nRows, 1, nRows};
 
         for(int index = 0; index < times; index++){
+            /* Get a random direction. */
             directionIndex = random.nextInt(4);
             direction =  directions[directionIndex];
+
+            /* The new randomIndex is the dataIndex + the random direction. */
             randomIndex = dataIndex + direction;
 
+            /*
+             * Check for all directions and the bounds that are coupled with
+             * these directions.
+             */
             if(direction == -1 && randomIndex >= 0 &&
                 (randomIndex % nRows != 0 && randomIndex != 0)){
                 Collections.swap(dataArray, randomIndex, dataIndex);
@@ -97,10 +120,15 @@ public class ImageAdapter extends BaseAdapter {
             } else{
                 continue;
             }
+            /* The dataIndex changes to randomIndex when swapping is allowed. */
             dataIndex = randomIndex;
         }
     }
 
+    /*
+     * Set the new size of the gridView, so the bitmap can be redivided
+     * correctly.
+     */
     public void setSize(int cols, int rows){
         this.nCols = cols;
         this.nRows = rows;
@@ -109,6 +137,7 @@ public class ImageAdapter extends BaseAdapter {
         }
     }
 
+    /* Method to check if all tiles are in their right places*/
     public boolean isFinished(){
         for(int index = 0; index < nCols * nRows; index++){
             if(dataArray.get(index).position != index){
@@ -118,23 +147,28 @@ public class ImageAdapter extends BaseAdapter {
         return true;
     }
 
+    /* Method to divide the bitmap into equally sized tiles. */
     private void divideBitmap(){
         int width, height;
+        /* Empty the ArrayList. */
         this.dataArray.clear();
 
         width = gridBitmap.getWidth() / nCols;
         height = gridBitmap.getHeight() / nRows;
+
+        /* Loop through the tiles and fill all bitmaps but the last. */
         for(int index = 0; index < (nCols * nRows) - 1; index++){
             this.dataArray.add(new GridData(
                 Bitmap.createBitmap(gridBitmap, (index % nCols) * width,
                     (index / nRows) * height, width, height), index, false));
         }
+        /* Fill the last entry of the dataArray with a white colored bitmap. */
         this.dataArray.add(new GridData(
                 Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444),
                                     (nCols * nRows) - 1, true));
     }
 
-    // create a new ImageView for each item referenced by the Adapter
+    /* Create a new ImageView for each item referenced by the Adapter. */
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
         if (convertView == null) {
