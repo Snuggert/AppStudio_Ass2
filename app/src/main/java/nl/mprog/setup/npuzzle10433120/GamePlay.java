@@ -1,5 +1,11 @@
 package nl.mprog.setup.npuzzle10433120;
 
+/*
+ * Abe Wiersma
+ * 10433120
+ * abe.wiersma@hotmail.nl
+ */
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,18 +28,18 @@ import java.io.IOException;
 public class GamePlay extends ActionBarActivity {
 
     private static final int GALLERY = 1;
+    private final CharSequence difs[]
+            = new CharSequence[] {"easy", "medium", "hard"};
+    private final int[] sizes = {3,4,5};
+
     private static ImageAdapter imageAdapter;
     private static GridView gridView;
-    private static int nCols = 4;
-    private static int nRows = 4;
-    private static int whichIndex = 1;
-    private final CharSequence difs[]
-        = new CharSequence[] {"easy", "medium", "hard"};
-    private final int[] sizes = {3,4,5};
-    private static boolean started = false;
     private static AlertDialog.Builder builder;
     private static TextView finishText;
     private static MenuItem gameButton;
+
+    private static int whichIndex;
+    private static boolean started;
     private static long startTime;
 
     @Override
@@ -41,26 +47,29 @@ public class GamePlay extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_activity);
 
+        whichIndex = 1;
+        started = false;
+
         finishText = (TextView) findViewById(R.id.finishView);
-        gameButton = (MenuItem) findViewById(R.id.game_button);
 
         gridView = (GridView) findViewById(R.id.gridView);
-        gridView.setNumColumns(nCols);
+        gridView.setNumColumns(4);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
             if(imageAdapter.trySwitch(position)){
-                gridView.setAdapter(imageAdapter);
+                imageAdapter.notifyDataSetChanged();
                 if(imageAdapter.isFinished()){
-                    long endtime = SystemClock.uptimeMillis() - startTime;
-                    finishText.setText("Finished " + ((int)(endtime / 1000)) + " seconden.");
+                    long endTime = stopTimer(startTime);
+                    finishText.setText("Finished " + (endTime / 1000) + " seconden.");
+
                 }
             }
             }
         });
 
         imageAdapter = new ImageAdapter(this);
-        imageAdapter.setSize(nCols, nRows);
+        imageAdapter.setSize(4, 4);
         gridView.setAdapter(imageAdapter);
 
         builder = new AlertDialog.Builder(this);
@@ -69,11 +78,9 @@ public class GamePlay extends ActionBarActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 whichIndex = which;
-                nCols = sizes[which];
-                nRows = sizes[which];
-                gridView.setNumColumns(nCols);
-                imageAdapter.setSize(nCols, nRows);
-                gridView.setAdapter(imageAdapter);
+                gridView.setNumColumns(sizes[which]);
+                imageAdapter.setSize(sizes[which], sizes[which]);
+                imageAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -83,6 +90,7 @@ public class GamePlay extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        gameButton = (MenuItem) findViewById(R.id.game_button);
         return true;
     }
 
@@ -102,17 +110,19 @@ public class GamePlay extends ActionBarActivity {
                 Intent.createChooser(intent, "Select Picture"), GALLERY);
         }else if (id == R.id.game_button) {
             if(this.started){
-                imageAdapter.resetBitmap();
-                gridView.setAdapter(imageAdapter);
-                this.started = !this.started;
-                finishText.setText("");
+                this.started = false;
+
                 if(gameButton != null)
                     gameButton.setTitle("Start");
-                startTime = SystemClock.uptimeMillis();
+
+                imageAdapter.resetBitmap();
+                imageAdapter.notifyDataSetChanged();
+                finishText.setText("");
+                startTime = startTimer();
             }else{
                 this.started = true;
                 imageAdapter.shuffleBitmap(1000);
-                gridView.setAdapter(imageAdapter);
+                imageAdapter.notifyDataSetChanged();
                 if(gameButton != null)
                     gameButton.setTitle("Reset");
             }
@@ -129,12 +139,20 @@ public class GamePlay extends ActionBarActivity {
                     this.getContentResolver(), mImageUri);
                 imageAdapter.setBitmap(Image, gridView.getWidth(),
                                        gridView.getHeight());
-                gridView.setAdapter(imageAdapter);
+                imageAdapter.notifyDataSetChanged();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private long startTimer(){
+        return SystemClock.uptimeMillis();
+    }
+
+    private long stopTimer(long startTime){
+        return SystemClock.uptimeMillis() - startTime;
     }
 }
