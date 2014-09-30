@@ -2,9 +2,13 @@ package nl.mprog.setup.npuzzle10433120;
 
 import android.graphics.Bitmap;
 
-/**
- * Created by TheAbe on 25-Sep-14.
+/*
+ * Abe Wiersma
+ * 10433120
+ * abe.wiersma@hotmail.nl
  */
+
+/* Class to store data assigned to a tile bitmap. */
 public class GridData {
         public Bitmap picture;
         public int position;

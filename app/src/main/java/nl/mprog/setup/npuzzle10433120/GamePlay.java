@@ -37,9 +37,11 @@ public class GamePlay extends ActionBarActivity {
     private static AlertDialog.Builder builder;
     private static TextView finishText;
     private static MenuItem gameButton;
+    private static Intent galleryIntent;
 
     private static int whichIndex;
     private static boolean started;
+    private static int moves;
     private static long startTime;
 
     @Override
@@ -48,6 +50,7 @@ public class GamePlay extends ActionBarActivity {
         setContentView(R.layout.game_activity);
 
         whichIndex = 1;
+        moves = 0;
         started = false;
 
         finishText = (TextView) findViewById(R.id.finishView);
@@ -57,12 +60,14 @@ public class GamePlay extends ActionBarActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-            if(imageAdapter.trySwitch(position)){
+            if(imageAdapter.trySwitch(position) && started){
+                moves ++;
                 imageAdapter.notifyDataSetChanged();
                 if(imageAdapter.isFinished()){
-                    long endTime = stopTimer(startTime);
-                    finishText.setText("Finished " + (endTime / 1000) + " seconden.");
-
+                    finishText.setText("Finished " +
+                                       stopTimer(startTime) +
+                                       " seconden.");
+                    started = false;
                 }
             }
             }
@@ -83,12 +88,16 @@ public class GamePlay extends ActionBarActivity {
                 imageAdapter.notifyDataSetChanged();
             }
         });
+
+        galleryIntent = new Intent();
+        galleryIntent.setType("image/*");
+        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        /* Inflate the menu, add items to the action bar if present. */
         getMenuInflater().inflate(R.menu.main, menu);
         gameButton = (MenuItem) findViewById(R.id.game_button);
         return true;
@@ -96,42 +105,34 @@ public class GamePlay extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        /*
+         * Handle action bar item clicks here. The action bar will
+         * automatically handle clicks on the Home/Up button, so long
+         * as you specify a parent activity in AndroidManifest.xml.
+         */
         int id = item.getItemId();
         if (id == R.id.change_difficulty) {
             builder.show();
         }else if (id == R.id.change_picture) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(
-                Intent.createChooser(intent, "Select Picture"), GALLERY);
+                Intent.createChooser(galleryIntent, "Select Picture"), GALLERY);
         }else if (id == R.id.game_button) {
-            if(this.started){
-                this.started = false;
-
-                if(gameButton != null)
-                    gameButton.setTitle("Start");
-
-                imageAdapter.resetBitmap();
-                imageAdapter.notifyDataSetChanged();
-                finishText.setText("");
-                startTime = startTimer();
+            if(started){
+                resetGame();
             }else{
-                this.started = true;
-                imageAdapter.shuffleBitmap(1000);
-                imageAdapter.notifyDataSetChanged();
-                if(gameButton != null)
-                    gameButton.setTitle("Reset");
+                startGame();
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
+    /* Method that is called after an Intent returns a result. */
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data){
+        /*
+         * When the intent that returns was the pickGallery intent handle the
+         * new picture.
+         */
         if (requestCode == GALLERY && resultCode != 0) {
             Uri mImageUri = data.getData();
             try {
@@ -148,10 +149,44 @@ public class GamePlay extends ActionBarActivity {
         }
     }
 
+    /*
+     * Method wrapper in which all methods called when starting a game are
+     * present.
+     */
+    private void startGame(){
+        started = true;
+
+        imageAdapter.shuffleBitmap(1000);
+        imageAdapter.notifyDataSetChanged();
+
+        startTime = startTimer();
+
+        if(gameButton != null)
+            gameButton.setTitle("Reset");
+    }
+
+    /*
+     * Method wrapper in which all methods called when resetting a game are
+     * present.
+     */
+    private void resetGame(){
+        started = false;
+
+        imageAdapter.resetBitmap();
+        imageAdapter.notifyDataSetChanged();
+
+        finishText.setText("");
+
+        if(gameButton != null)
+            gameButton.setTitle("Start");
+    }
+
+    /* Method to start a timer. */
     private long startTimer(){
         return SystemClock.uptimeMillis();
     }
 
+    /* Method the stop the timer based on a previous start time. */
     private long stopTimer(long startTime){
         return SystemClock.uptimeMillis() - startTime;
     }
