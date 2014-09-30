@@ -61,7 +61,7 @@ public class GamePlay extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
             if(imageAdapter.trySwitch(position) && started){
-                moves ++;
+                moves  = moves + 1;
                 imageAdapter.notifyDataSetChanged();
                 if(imageAdapter.isFinished()){
                     finishText.setText("Finished " +
@@ -171,6 +171,7 @@ public class GamePlay extends ActionBarActivity {
      */
     private void resetGame(){
         started = false;
+        moves = 0;
 
         imageAdapter.resetBitmap();
         imageAdapter.notifyDataSetChanged();
