@@ -63,10 +63,11 @@ public class GamePlay extends ActionBarActivity {
         movesText = (TextView) findViewById(R.id.movesText);
         timeText = (TextView) findViewById(R.id.timeText);
 
-
+        /* Gridview object for the tiled layout of pictures. */
         gridView = (GridView) findViewById(R.id.gridView);
         gridView.setNumColumns(4);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /* Method called when an element of the grid is clicked. */
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 timeText.setText("Time: " + stopTimer(startTime) + " sec");
@@ -81,22 +82,31 @@ public class GamePlay extends ActionBarActivity {
             }
         });
 
+        /* Initialize imageAdapter with the default difficulty medium 4x4. */
         imageAdapter = new ImageAdapter(this);
         imageAdapter.setSize(4, 4);
         gridView.setAdapter(imageAdapter);
 
+        /* Builder object that pops up when the difficulty is to be changed. */
         builder = new AlertDialog.Builder(this);
         builder.setTitle("Pick a difficulty");
-        builder.setSingleChoiceItems(difs, whichIndex, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                whichIndex = which;
-                gridView.setNumColumns(sizes[which]);
-                imageAdapter.setSize(sizes[which], sizes[which]);
-                imageAdapter.notifyDataSetChanged();
+        builder.setSingleChoiceItems(difs, whichIndex,
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    whichIndex = which;
+                    gridView.setNumColumns(sizes[which]);
+                    imageAdapter.setSize(sizes[which], sizes[which]);
+                    imageAdapter.notifyDataSetChanged();
+                    resetGame();
+                }
             }
-        });
+        );
 
+        /*
+         * Initialization of the gallery intent to select a bitmap for the
+         * gridview.
+         */
         galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
@@ -151,6 +161,7 @@ public class GamePlay extends ActionBarActivity {
                 imageAdapter.setBitmap(Image, gridView.getWidth(),
                                        gridView.getHeight());
                 imageAdapter.notifyDataSetChanged();
+                resetGame();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -176,7 +187,7 @@ public class GamePlay extends ActionBarActivity {
     }
 
     /*
-     * Method wrapper in which all methods called when resetting a game are
+     * Wrapper method in which all methods called when resetting a game are
      * present.
      */
     private void resetGame(){
@@ -203,6 +214,7 @@ public class GamePlay extends ActionBarActivity {
         return (int)(SystemClock.uptimeMillis() - startTime) / 1000;
     }
 
+    /* Wrapper method for when game ends. */
     private void startYouWin(){
         Intent i = new Intent(GamePlay.this, YouWin.class);
         i.putExtra("timeSpent", stopTimer(startTime));
