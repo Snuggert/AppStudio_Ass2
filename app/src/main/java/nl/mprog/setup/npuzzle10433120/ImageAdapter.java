@@ -91,6 +91,7 @@ public class ImageAdapter extends BaseAdapter {
         float originalHeight = bitmap.getHeight();
         float scale;
 
+        /* Scale according to largest side length. */
         if(originalWidth > originalHeight){
             scale = width/originalWidth;
         }else{

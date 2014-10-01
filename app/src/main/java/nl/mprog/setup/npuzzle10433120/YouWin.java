@@ -16,22 +16,15 @@ import java.util.Set;
 
 public class YouWin extends Activity {
 
-    TextView timeSpentView;
-    TextView movesView;
-    TextView highScoreView;
-    TextView highMovesView;
+    private TextView timeSpentView;
+    private TextView movesView;
+    private TextView highScoreView;
+    private TextView highMovesView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.youwin_activity);
-
-        int highscoreTimeSpent, timeSpent, highscoreMoves, moves;
-        String difficulty;
-
-        Intent mIntent = getIntent();
-        timeSpent = mIntent.getIntExtra("timeSpent", 0);
-        moves = mIntent.getIntExtra("moves", 0);
-        difficulty = mIntent.getStringExtra("difficulty");
 
         timeSpentView = (TextView) findViewById(R.id.scoreView);
         movesView = (TextView) findViewById(R.id.movesView);
@@ -39,17 +32,29 @@ public class YouWin extends Activity {
         highScoreView = (TextView) findViewById(R.id.highScore);
         highMovesView = (TextView) findViewById(R.id.highMoves);
 
+        int highscoreTimeSpent, timeSpent, highscoreMoves, moves;
+        String difficulty;
+
+        /* Get data transmitted from underlying activity. */
+        Intent mIntent = getIntent();
+        timeSpent = mIntent.getIntExtra("timeSpent", 0);
+        moves = mIntent.getIntExtra("moves", 0);
+        difficulty = mIntent.getStringExtra("difficulty");
+
+        /* Set own scores. */
         timeSpentView.setText("Score: " + timeSpent + " sec");
         movesView.setText("Moves: " + moves);
 
+        /* Get data from SharedPreferences. */
         SharedPreferences sharedPref = this.getSharedPreferences(
                 getString(R.string.preference_file_key), this.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
         String highscore = sharedPref.getString(difficulty, "99999,99999");
+
         if(highscore != null) {
             highscoreTimeSpent = Integer.parseInt(highscore.split(",")[0]);
             highscoreMoves = Integer.parseInt(highscore.split(",")[1]);
             if(highscoreTimeSpent > timeSpent){
+                SharedPreferences.Editor editor = sharedPref.edit();
                 editor.clear();
                 editor.putString(difficulty, timeSpent + "," + moves);
                 editor.commit();
