@@ -32,17 +32,17 @@ public class GamePlay extends ActionBarActivity {
             = new CharSequence[] {"easy", "medium", "hard"};
     private final int[] sizes = {3,4,5};
 
-    private static ImageAdapter imageAdapter;
-    private static GridView gridView;
-    private static AlertDialog.Builder builder;
-    private static TextView finishText;
-    private static MenuItem gameButton;
-    private static Intent galleryIntent;
+    private ImageAdapter imageAdapter;
+    private GridView gridView;
+    private AlertDialog.Builder builder;
+    private TextView finishText;
+    private MenuItem gameButton;
+    private Intent galleryIntent;
 
-    private static int whichIndex;
-    private static boolean started;
-    private static int moves;
-    private static long startTime;
+    private int whichIndex;
+    private boolean started;
+    private int moves;
+    private long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +64,12 @@ public class GamePlay extends ActionBarActivity {
                 moves  = moves + 1;
                 imageAdapter.notifyDataSetChanged();
                 if(imageAdapter.isFinished()){
-                    finishText.setText("Finished " +
-                                       stopTimer(startTime) +
-                                       " seconden.");
+                    Intent i = new Intent(GamePlay.this, YouWin.class);
+                    i.putExtra("timeSpent", stopTimer(startTime));
+                    i.putExtra("moves", moves);
+                    startActivity(i);
+
+                    finishText.setText("Finished");
                     started = false;
                 }
             }
@@ -155,6 +158,7 @@ public class GamePlay extends ActionBarActivity {
      */
     private void startGame(){
         started = true;
+        moves = 0;
 
         imageAdapter.shuffleBitmap(1000);
         imageAdapter.notifyDataSetChanged();
@@ -187,8 +191,8 @@ public class GamePlay extends ActionBarActivity {
         return SystemClock.uptimeMillis();
     }
 
-    /* Method the stop the timer based on a previous start time. */
+    /* Method the stop the timer based on a previous start time(in sec). */
     private long stopTimer(long startTime){
-        return SystemClock.uptimeMillis() - startTime;
+        return (SystemClock.uptimeMillis() - startTime) / 1000;
     }
 }

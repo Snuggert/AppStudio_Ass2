@@ -9,8 +9,30 @@
     tools:context="nl.mprog.setup.npuzzle10433120.YouWin">
 
     <TextView
-        android:text="@string/hello_world"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/you_win"
+        android:id="@+id/youWin"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/score"
+        android:id="@+id/scoreView"
+        android:layout_below="@+id/youWin"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/moves"
+        android:id="@+id/movesView"
+        android:layout_below="@+id/scoreView"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>
