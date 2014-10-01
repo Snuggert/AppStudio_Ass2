@@ -24,18 +24,24 @@ import android.widget.TextView;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GamePlay extends ActionBarActivity {
 
-    private static final int GALLERY = 1;
+    private final int GALLERY = 1;
     private final CharSequence difs[]
             = new CharSequence[] {"easy", "medium", "hard"};
     private final int[] sizes = {3,4,5};
 
+    private TextView finishText;
+    private TextView movesText;
+    private TextView timeText;
+
     private ImageAdapter imageAdapter;
     private GridView gridView;
     private AlertDialog.Builder builder;
-    private TextView finishText;
     private MenuItem gameButton;
     private Intent galleryIntent;
 
@@ -54,25 +60,24 @@ public class GamePlay extends ActionBarActivity {
         started = false;
 
         finishText = (TextView) findViewById(R.id.finishView);
+        movesText = (TextView) findViewById(R.id.movesText);
+        timeText = (TextView) findViewById(R.id.timeText);
+
 
         gridView = (GridView) findViewById(R.id.gridView);
         gridView.setNumColumns(4);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-            if(imageAdapter.trySwitch(position) && started){
-                moves  = moves + 1;
-                imageAdapter.notifyDataSetChanged();
-                if(imageAdapter.isFinished()){
-                    Intent i = new Intent(GamePlay.this, YouWin.class);
-                    i.putExtra("timeSpent", stopTimer(startTime));
-                    i.putExtra("moves", moves);
-                    startActivity(i);
+                timeText.setText("Time: " + stopTimer(startTime) + " sec");
+                if(imageAdapter.trySwitch(position) && started){
+                    moves  = moves + 1;
+                    movesText.setText("Moves: " + moves);
+                    imageAdapter.notifyDataSetChanged();
 
-                    finishText.setText("Finished");
-                    started = false;
+                    if(imageAdapter.isFinished())
+                        startYouWin();
                 }
-            }
             }
         });
 
@@ -95,6 +100,8 @@ public class GamePlay extends ActionBarActivity {
         galleryIntent = new Intent();
         galleryIntent.setType("image/*");
         galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(
+                Intent.createChooser(galleryIntent, "Select Picture"), GALLERY);
     }
 
 
@@ -102,7 +109,7 @@ public class GamePlay extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         /* Inflate the menu, add items to the action bar if present. */
         getMenuInflater().inflate(R.menu.main, menu);
-        gameButton = (MenuItem) findViewById(R.id.game_button);
+        gameButton = menu.findItem(R.id.game_button);
         return true;
     }
 
@@ -165,8 +172,7 @@ public class GamePlay extends ActionBarActivity {
 
         startTime = startTimer();
 
-        if(gameButton != null)
-            gameButton.setTitle("Reset");
+        gameButton.setTitle("Reset");
     }
 
     /*
@@ -180,10 +186,11 @@ public class GamePlay extends ActionBarActivity {
         imageAdapter.resetBitmap();
         imageAdapter.notifyDataSetChanged();
 
+        movesText.setText("Moves:");
+        timeText.setText("Time:");
         finishText.setText("");
 
-        if(gameButton != null)
-            gameButton.setTitle("Start");
+        gameButton.setTitle("Start");
     }
 
     /* Method to start a timer. */
@@ -192,7 +199,19 @@ public class GamePlay extends ActionBarActivity {
     }
 
     /* Method the stop the timer based on a previous start time(in sec). */
-    private long stopTimer(long startTime){
-        return (SystemClock.uptimeMillis() - startTime) / 1000;
+    private int stopTimer(long startTime){
+        return (int)(SystemClock.uptimeMillis() - startTime) / 1000;
+    }
+
+    private void startYouWin(){
+        Intent i = new Intent(GamePlay.this, YouWin.class);
+        i.putExtra("timeSpent", stopTimer(startTime));
+        i.putExtra("moves", moves);
+        i.putExtra("difficulty", difs[whichIndex]);
+        startActivity(i);
+
+        finishText.setText("Finished");
+        gameButton.setTitle("Start");
+        started = false;
     }
 }

@@ -13,4 +13,4 @@ the next activity which is the game activity.
 Because i work a lot with python i tend to stick to the style guide i use with python whilst programming in other languages. The styleguide is PEP8. The rules can be read here: http://legacy.python.org/dev/peps/pep-0008/
 
 ## APIS
-
+SharedPreferences API to store and read highscores.

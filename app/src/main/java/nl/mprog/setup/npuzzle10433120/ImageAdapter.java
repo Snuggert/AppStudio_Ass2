@@ -8,6 +8,9 @@ package nl.mprog.setup.npuzzle10433120;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -71,11 +74,39 @@ public class ImageAdapter extends BaseAdapter {
 
     /* Set the bitmap of the adapter to a new bitmap. */
     public void setBitmap(Bitmap bitmap, int width, int height){
-        this.gridBitmap =
-                Bitmap.createScaledBitmap(bitmap, width, height, false);
+        this.gridBitmap = createRatioScaledBitmap(bitmap, width, height);
         if(gridBitmap != null){
             divideBitmap();
         }
+    }
+
+    /* Method to create scaled bitmaps maintaining ratio. */
+    public Bitmap createRatioScaledBitmap(Bitmap bitmap, int width, int height){
+        Bitmap background = Bitmap.createBitmap((int)width, (int)height,
+                                                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(background);
+        Matrix transformation = new Matrix();
+
+        float originalWidth = bitmap.getWidth();
+        float originalHeight = bitmap.getHeight();
+        float scale;
+
+        if(originalWidth > originalHeight){
+            scale = width/originalWidth;
+        }else{
+            scale = height/originalHeight;
+        }
+        float xTranslation = (width - originalWidth * scale)/ 2.0f ;
+        float yTranslation = (height - originalHeight * scale)/2.0f;
+
+        transformation.postTranslate(xTranslation, yTranslation);
+        transformation.preScale(scale, scale);
+
+        Paint paint = new Paint();
+        paint.setFilterBitmap(true);
+
+        canvas.drawBitmap(bitmap, transformation, paint);
+        return background;
     }
 
     /* Reset the bitmap when the gridBitmap isn't null. */
