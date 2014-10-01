@@ -140,8 +140,8 @@ public class ImageAdapter extends BaseAdapter {
              * Check for all directions and the bounds that are coupled with
              * these directions.
              */
-            if(direction == -1 && randomIndex >= 0 &&
-                (randomIndex % nRows != 0 && randomIndex != 0)){
+            if(direction == -1 && (randomIndex >= 0 &&
+                (dataIndex % nRows != 0 && randomIndex != 0))){
                 Collections.swap(dataArray, randomIndex, dataIndex);
             } else if(direction == -nRows && randomIndex >= 0){
                 Collections.swap(dataArray, randomIndex, dataIndex);
